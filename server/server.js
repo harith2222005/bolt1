@@ -48,10 +48,34 @@ app.use(helmet());
 app.use(rateLimiter);
 
 // CORS configuration
-app.use(cors({
+// app.use(cors({
+//   origin: process.env.CLIENT_URL || 'http://localhost:5173',
+//   credentials: true,
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+
+// Replace current CORS setup with:
+const corsOptions = {
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
-}));
+  credentials: true,
+    allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'X-Client-Version', // Add this line
+    'X-CSRF-TOKEN',    // Add this if using CSRF
+    'X-Request-ID'     // Add this if using request tracking
+  ],
+  exposedHeaders: [
+    'Content-Disposition' // For file downloads
+  ],
+
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Preflight handling
 
 // Body parsing middleware
 app.use(express.json({ limit: '50mb' }));

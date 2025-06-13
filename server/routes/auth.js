@@ -135,6 +135,14 @@ router.post('/login', async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
+    // In login route response:
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax', // Changed from 'strict' for better compatibility
+  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+});
+
     res.json({
       success: true,
       message: 'Login successful',
