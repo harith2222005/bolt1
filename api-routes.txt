@@ -1,0 +1,220 @@
+# GuardShare API Routes Documentation
+
+## Base URL
+- Development: http://localhost:5000/api
+- Production: [Your production URL]/api
+
+## Authentication Routes (/auth)
+
+### POST /auth/register
+Register a new user account
+- Body: { username, email, password, confirmPassword }
+- Response: { success, message, user }
+
+### POST /auth/login
+Authenticate user and get JWT token
+- Body: { username, password }
+- Response: { success, message, token, user }
+
+### GET /auth/me
+Get current user information (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: { success, user }
+
+### POST /auth/logout
+Log out user (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: { success, message }
+
+### PUT /auth/profile
+Update user profile (requires auth)
+- Headers: Authorization: Bearer <token>
+- Body: { username?, email? }
+- Response: { success, message, user }
+
+## File Routes (/files)
+
+### POST /files/upload
+Upload a new file (requires auth)
+- Headers: Authorization: Bearer <token>, Content-Type: multipart/form-data
+- Body: FormData with 'file' and 'customFilename'
+- Response: { success, message, file }
+
+### GET /files
+Get user's files with pagination and filters (requires auth)
+- Headers: Authorization: Bearer <token>
+- Query: page?, limit?, search?, favorite?, sortBy?, sortOrder?
+- Response: { success, files, pagination }
+
+### GET /files/recent
+Get recent files for dashboard (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: { success, files }
+
+### GET /files/:id/download
+Download a file (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: File blob
+
+### PATCH /files/:id/favorite
+Toggle file favorite status (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: { success, message, file }
+
+### DELETE /files/:id
+Delete file and all associated links (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: { success, message }
+
+### GET /files/admin/all
+Get all files (superuser only)
+- Headers: Authorization: Bearer <token>
+- Query: page?, limit?, search?, sortBy?, sortOrder?
+- Response: { success, files, pagination }
+
+## Link Routes (/links)
+
+### POST /links
+Create a new shareable link (requires auth)
+- Headers: Authorization: Bearer <token>
+- Body: { fileId, customName, expirationType?, expirationValue?, accessLimit?, verificationType?, verificationValue?, accessScope?, allowedUsers?, downloadAllowed?, description? }
+- Response: { success, message, link }
+
+### GET /links
+Get user's links with pagination and filters (requires auth)
+- Headers: Authorization: Bearer <token>
+- Query: page?, limit?, search?, active?, sortBy?, sortOrder?
+- Response: { success, links, pagination }
+
+### GET /links/recent
+Get recent links for dashboard (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: { success, links }
+
+### GET /links/access/:linkId
+Access a link (public endpoint with optional auth)
+- Headers: Authorization: Bearer <token> (optional)
+- Query: password?, username?
+- Response: { success, link }
+
+### GET /links/download/:linkId
+Download file via link (public endpoint with optional auth)
+- Headers: Authorization: Bearer <token> (optional)
+- Query: password?, username?
+- Response: File blob
+
+### PATCH /links/:id/toggle
+Toggle link active status (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: { success, message, link }
+
+### DELETE /links/:id
+Delete a link (requires auth)
+- Headers: Authorization: Bearer <token>
+- Response: { success, message }
+
+### GET /links/admin/all
+Get all links (superuser only)
+- Headers: Authorization: Bearer <token>
+- Query: page?, limit?, search?, sortBy?, sortOrder?
+- Response: { success, links, pagination }
+
+## User Routes (/users) - Superuser Only
+
+### GET /users
+Get all users with pagination and filters
+- Headers: Authorization: Bearer <token>
+- Query: page?, limit?, search?, sortBy?, sortOrder?
+- Response: { success, users, pagination }
+
+### GET /users/:id
+Get user details
+- Headers: Authorization: Bearer <token>
+- Response: { success, user }
+
+### DELETE /users/:id
+Delete/deactivate user and associated data
+- Headers: Authorization: Bearer <token>
+- Response: { success, message }
+
+### PATCH /users/:id/role
+Update user role
+- Headers: Authorization: Bearer <token>
+- Body: { role }
+- Response: { success, message, user }
+
+### GET /users/:id/activity
+Get user activity logs
+- Headers: Authorization: Bearer <token>
+- Query: page?, limit?
+- Response: { success, username, activityLogs, pagination }
+
+### GET /users/search/for-links
+Search users for link access control
+- Headers: Authorization: Bearer <token>
+- Query: q (search query)
+- Response: { success, users }
+
+## Health Check
+
+### GET /health
+Check API health status
+- Response: { status, timestamp, environment }
+
+## Error Responses
+
+All endpoints may return error responses in the format:
+```json
+{
+  "success": false,
+  "message": "Error description"
+}
+```
+
+Common HTTP status codes:
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 429: Too Many Requests
+- 500: Internal Server Error
+
+## Rate Limiting
+
+- General API: 100 requests per minute per IP
+- Authentication endpoints: 5 requests per minute per IP
+- File upload: 10 uploads per 5 minutes per IP
+
+## File Upload Limits
+
+- Maximum file size: 50MB
+- Supported file types: All (no restrictions currently)
+- Storage: MongoDB GridFS
+
+## Link Configuration Options
+
+### Expiration Types
+- 'none': Never expires
+- 'duration': Expires after specified seconds
+- 'date': Expires at specific date/time
+
+### Verification Types
+- 'none': No verification required
+- 'password': Requires password
+- 'username': Requires username
+
+### Access Scopes
+- 'public': Anyone with link can access
+- 'users': Only registered users can access
+- 'selected': Only specified users can access
+
+## Authentication
+
+All protected endpoints require a JWT token in the Authorization header:
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+Tokens expire after 7 days by default and need to be refreshed by logging in again.

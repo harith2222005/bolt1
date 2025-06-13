@@ -1,0 +1,171 @@
+# GuardShare File Structure and Purpose
+
+## Root Directory
+- `.env.example` - Template for environment variables
+- `.gitignore` - Git ignore patterns for security and cleanup
+- `package.json` - Main project dependencies and scripts
+- `api-routes.txt` - Complete API documentation
+- `file-purpose.txt` - This file explaining project structure
+
+## Server Directory (/server)
+Backend Node.js/Express application with MongoDB
+
+### Main Files
+- `server.js` - Main server entry point, Express app setup, middleware, routes
+- `package.json` - Server-specific dependencies
+- `.env` - Server environment variables (MongoDB, JWT secrets, etc.)
+
+### Models (/server/models)
+MongoDB/Mongoose data models
+- `User.js` - User accounts, authentication, activity logs, roles
+- `File.js` - File metadata, GridFS references, favorites, tags
+- `Link.js` - Shareable links, access control, expiration, verification
+
+### Routes (/server/routes)
+API endpoint handlers
+- `auth.js` - Authentication (login, register, profile management)
+- `files.js` - File upload, download, management, GridFS operations
+- `links.js` - Link creation, access control, public file access
+- `users.js` - User management (superuser only), role updates
+
+### Middleware (/server/middleware)
+Express middleware functions
+- `auth.js` - JWT authentication, role-based authorization
+- `errorHandler.js` - Global error handling, validation errors
+- `rateLimiter.js` - Rate limiting for API protection
+
+### Utilities (/server/utils)
+Helper functions and background tasks
+- `cleanup.js` - Cron job functions for expired link cleanup
+
+## Client Directory (/src)
+React frontend application with TypeScript
+
+### Main Files
+- `App.tsx` - Main app component, routing setup
+- `main.tsx` - React app entry point
+- `index.css` - Tailwind CSS imports
+
+### Pages (/src/pages)
+Main application pages
+- `Login.tsx` - User authentication page
+- `Register.tsx` - User registration page
+- `Dashboard.tsx` - Main dashboard layout with routing
+- `LinkAccess.tsx` - Public link access page (no auth required)
+
+### Contexts (/src/contexts)
+React context providers for global state
+- `AuthContext.tsx` - User authentication state, login/logout
+- `ThemeContext.tsx` - Dark/light theme management
+
+### Services (/src/services)
+API communication layer
+- `api.ts` - Axios setup, API methods, error handling
+
+### Components
+Reusable React components organized by feature
+
+#### Authentication (/src/components/auth)
+- `ProtectedRoute.tsx` - Route protection for authenticated users
+- `PublicRoute.tsx` - Route protection for non-authenticated users
+
+#### Dashboard (/src/components/dashboard)
+Main application interface components
+- `Sidebar.tsx` - Navigation sidebar with user info
+- `TopBar.tsx` - Top navigation with search and theme toggle
+- `Home.tsx` - Dashboard home page with recent files/links
+- `Files.tsx` - File management interface with upload/download
+- `Links.tsx` - Link management interface with creation/sharing
+- `Users.tsx` - User management interface (superuser only)
+- `ProfileModal.tsx` - User profile editing modal
+- `FileUploadModal.tsx` - File upload interface with drag/drop
+- `CreateLinkModal.tsx` - Link creation with advanced options
+
+#### UI Components (/src/components/ui)
+Reusable UI elements
+- `LoadingSpinner.tsx` - Loading indicator component
+- `LightningBackground.tsx` - Animated background effect
+- `LightningBackground.css` - Styles for lightning animation
+
+### Styles (/src/styles)
+Global styling and theme system
+- `global.css` - Global styles, CSS variables, glassmorphism effects
+
+## Key Features Implemented
+
+### Authentication & Security
+- JWT-based authentication with refresh
+- Role-based access control (user/superuser)
+- Rate limiting on API endpoints
+- Password hashing with bcrypt
+- Activity logging for audit trails
+
+### File Management
+- GridFS storage for large files (50MB limit)
+- Custom filename support
+- File favorites and tagging
+- Bulk operations and search
+- Download tracking and analytics
+
+### Link Sharing System
+- Custom link names with unique validation
+- Multiple expiration options (time/date/never)
+- Access limits and usage tracking
+- Verification systems (password/username)
+- Scope control (public/users/selected)
+- Download permission control
+
+### User Interface
+- Glassmorphism design with live lightning effects
+- Dark/light theme support
+- Responsive design for all devices
+- Advanced search and filtering
+- Real-time updates and notifications
+- Drag-and-drop file uploads
+
+### Admin Features (Superuser)
+- User management and role assignment
+- System-wide file and link overview
+- Activity monitoring and logs
+- Bulk operations and cleanup tools
+
+### Background Services
+- Automated cleanup of expired links
+- Cron jobs for maintenance tasks
+- Database optimization routines
+
+## Development Setup
+
+1. Install dependencies: `npm install`
+2. Set up environment variables (copy .env.example)
+3. Start MongoDB database
+4. Run development servers: `npm run dev`
+   - Client: http://localhost:5173
+   - Server: http://localhost:5000
+
+## Production Deployment
+
+- Build client: `npm run build`
+- Configure production environment variables
+- Set up MongoDB Atlas or production database
+- Deploy server with PM2 or similar process manager
+- Serve client build through nginx or CDN
+
+## Security Considerations
+
+- All file uploads are scanned and validated
+- JWT tokens have expiration and refresh cycles
+- Rate limiting prevents abuse
+- CORS configured for production domains
+- Environment variables for sensitive data
+- SQL injection prevention through Mongoose
+- XSS protection through input validation
+
+## Performance Optimizations
+
+- GridFS for efficient large file storage
+- Database indexing for fast queries
+- Pagination for large datasets
+- Lazy loading for UI components
+- Caching strategies for frequently accessed data
+- Optimized bundle sizes with tree shaking

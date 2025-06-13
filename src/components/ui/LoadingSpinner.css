@@ -1,0 +1,25 @@
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner-sm .spinner-border {
+  width: 1rem;
+  height: 1rem;
+}
+
+.loading-spinner-md .spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+.loading-spinner-lg .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.spinner-border {
+  border: 0.25em solid rgba(var(--gs-primary-rgb), 0.25);
+  border-right-color: rgb(var(--gs-primary-rgb));
+}

@@ -1,0 +1,27 @@
+.lightning-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(135deg, 
+    var(--gs-bg-primary) 0%, 
+    var(--gs-bg-secondary) 100%);
+}
+
+/* Ensure the lightning background doesn't interfere with scrolling */
+body {
+  overflow-x: hidden;
+}
+
+.app {
+  position: relative;
+  min-height: 100vh;
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
+}
